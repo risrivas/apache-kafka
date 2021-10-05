@@ -1,0 +1,105 @@
+#########
+# Basics
+#########
+- data flow: source systems => target systems
+- need to think about: protocol (TCP, HTTP, REST), data format (binary, csv, json)
+
+- source systems => Apache Kafka (high-throughput distributed messaging system) => target systems
+
+- can scale to 100 brokers (servers)
+- can scale to millions of messages per second
+- latency = <10ms real-time
+
+- Netflix uses Kafka to apply recommendations in real-time while watching TV shows
+- Uber uses Kafka to gather user, taxi and trip data in real-time to compute surge pricing and forecast demand
+- LinkedIn uses Kafka to prevent spam, collect user interactions for better recommendations
+
+
+###############
+# Kafka Theory
+###############
+
+# Topics
+- a particular stream of data
+- similar to table in a database
+- can have many topics
+- defined by its name
+
+- topics are split in partitions
+- each partition is ordered
+- each message within a partition gets an incremental id, called offset
+
+                             offsets
+                             -------
+               Partition 0 - 01234567...
+Kafka Topic -  Partition 1 - 0123456789...
+               Partition 2 - 012345...
+
+- example
+lots of trucks, each truck reports its GPS position to Kafka
+can have a topic: trucks_gps that contains the position of all trucks
+each truck will send a message to Kafka every 20 seconds
+each message will contain the truck ID and the truck position (latitude and longitude)
+we created topic with 10 partitions
+consumer of kafka may be a location dashboard or a notification service
+
+- Offset only have a meaning for a specific partition
+- example
+offset 3 in partition 0 doesn't represent the same data as offset 3 in partition 1
+
+- order is guaranteed only within a partition - not across partitions
+- data is deleted after a limited time (default 1 week)
+- once the data is written to a partition, it can't be changed (immutability)
+- data is assigned randomly to a partition unless a key is provided
+
+
+# Brokers
+- a Kafka cluster is composed of multiple brokers (servers)
+- each broker is identified with its ID (integer)
+- each broker contains certain topic partitions
+- after connecting to any broker (called a bootstrap broker), will be connected to the entire cluster
+- normal to start with 3 brokers but some big clusters have over 100 brokers
+
+- example
+3 brokers: 101, 102, 103
+
+Topic-A with 3 partitions
+101 = Topic-A, Partition 0
+102 = Topic-A, Partition 2
+103 = Topic-A, Partition 1
+
+Topic-B with 2 partitions
+101 = Topic-A, Partition 0; Topic-B, Partition 1
+102 = Topic-A, Partition 2; Topic-B, Partition 0
+103 = Topic-A, Partition 1
+
+
+# Topic replication factor
+- topics should have a replication factor > 1 (between 2 and 3)
+- failover handling of broker
+- only 1 broker can be a leader for a partition
+- only leader can receive and serve data for that partition
+- other brokers will synchronize the data
+- thus each partition has 1 leader and multiple ISR (in-sync replica)
+
+- example
+3 brokers: 101, 102, 103
+
+Topic-A with 2 partitions and replication factor of 2
+101 = Topic-A, Partition 0 (leader)
+102 = Topic-A, Partition 1 (leader); replicated Topic-A, Partition 0 from 101 (ISR)
+103 = replicated Topic-A, Partition 1 from 102 (ISR)
+
+if we lose 102, broker 101 and 103 can still serve the data
+
+
+
+
+
+
+
+
+
+
+
+
