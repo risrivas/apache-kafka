@@ -93,6 +93,77 @@ Topic-A with 2 partitions and replication factor of 2
 if we lose 102, broker 101 and 103 can still serve the data
 
 
+# Producers
+- Producers write data to topics (which is made of partitions)
+- Producers automatically know to which broker and partition to write to
+- In case of Broker failures, Producers will automatically recover
+
+- Producers can choose to receive ack of data writes:
+acks=0: won't wait for ack
+acks=1: will wait for leader ack
+acks=all: Leader + replicas ack
+
+- Producers can choose to send a key with the message (string, number, etc)
+if key=null, data is sent round robin (broker 101, then 102, then 103...)
+if a key is sent, then all messages for that key will always go to the same partition
+
+
+# Consumers
+- Consumers read data from a topic (identified by name)
+- Consumers know which broker to read from
+- In case of Broker failures, Consumers will automatically recover
+- Data is read in order within each partitions
+
+- Consumers read data in consumer groups
+- Each consumer within a group reads from exclusive partitions
+- If have more consumers than partitions, some consumers will be inactive
+
+# Consumer offsets
+- Kafka stores the offsets at which a consumer group has been reading
+- these offsets are committed live in a Kafka topic named __consumer_offsets
+- when a consumer in a group has processed data received from Kafka, it should be committing the offsets
+- if a consumer dies, it will be able to read back from where it left off - thanks to the committed offsets
+
+- Consumers choose when to commit offsets
+- there are 3 delivery semantics:
+at most once
+ - offsets are committed as soon as the message is received
+ - if the processing goes wrong, the message will be lost and it won't be read again
+at least once (preferred)
+ - offsets are committed after the message is processed
+ - if the processing goes worng, the message will be read again
+ - this can result in duplicate processing of messages => need to ensure processing is idempotent
+exactly once
+ - can be achieved for Kafka => Kafka workflows using Kafka Streams API
+ - for Kafka => External system workflows, need to use an idempotent consumer
+
+
+# Kafka Broker Discovery
+- every Kafka broker is also called a bootstrap server
+- this means we only need to connect to one broker, and will be connected to the entire cluster
+- each broker knows about all other brokers, topics and partitions (metadata)
+
+Kafka Client -> 1. Connection + Metadata request -> Kafka cluster (Broker 101, 102, 103....)
+             <- 2. List of all brokers
+             -> 3. Can connect to the needed brokers
+
+
+# Zookeeper
+- manages brokers (keeps a list of them)
+- helps in performing leader election for partitions
+- sends notifications to Kafka in case of changes (e.g. new topic, broker dies, broker comes up, delete topics, etc...)
+- Kafka cannot work without Zookeeper
+- by design operates with an odd number of servers (3, 5, 7)
+- has a leader (handle writes), the rest of the servers are followers (handle reads)
+- does NOT store consumer offsets
+
+
+# Kafka guarantees
+- messages are appended to a topic-partition in the order they are sent
+- consumers read messages in the order stored in a topic-partition
+- with a replication factor of N, producers and consumers can tolerate upto N-1 brokers being down
+- as long as the number of partitions remains constant for a topic (no new partitions), the same key will always go to the same partition
+
 
 
 
