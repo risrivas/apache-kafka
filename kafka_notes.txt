@@ -205,6 +205,61 @@ zookeeper-server-start config/zookeeper.properties
 - Start Kafka in another terminal window: 
 kafka-server-start config/server.properties
 
+################
+
+
+# Kafka Topics
+kafka-topics main arguments:
+ 
+--bootstrap-server <String: server to    REQUIRED: The Kafka server to connect
+  connect to>                              to.
+
+--topic <String: topic>                  The topic to create, alter, describe
+                                           or delete. It also accepts a regular
+                                           expression, except for --create
+                                           option. Put topic name in double
+                                           quotes and use the '\' prefix to
+                                           escape regular expression symbols; e.
+                                           g. "test\.topic".
+
+--create                                 Create a new topic.
+
+--partitions <Integer: # of partitions>  The number of partitions for the topic
+                                           being created or altered (WARNING:
+                                           If partitions are increased for a
+                                           topic that has a key, the partition
+                                           logic or ordering of the messages
+                                           will be affected). If not supplied
+                                           for create, defaults to the cluster
+                                           default.
+
+--replication-factor <Integer:           The replication factor for each
+  replication factor>                      partition in the topic being
+                                           created. If not supplied, defaults
+                                           to the cluster default.
+
+--list                                   List all available topics.
+
+--describe                               List details for the given topics.
+
+--delete                                 Delete a topic.
+
+
+- final command connect to a Kafka server and create a topic
+kafka-topics --bootstrap-server localhost:9092 --topic first_topic --create --partitions 3 --replication-factor 1
+kafka-topics --bootstrap-server localhost:9092 --topic second_topic --create --partitions 6 --replication-factor 1
+
+- list all topics
+kafka-topics --bootstrap-server localhost:9092 --list
+
+- describe a topic
+kafka-topics --bootstrap-server localhost:9092 --topic first_topic --describe
+
+- delete a topic
+kafka-topics --bootstrap-server localhost:9092 --topic second_topic --delete
+
+
+
 
 
 
