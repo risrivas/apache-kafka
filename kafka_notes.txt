@@ -131,7 +131,7 @@ at most once
  - if the processing goes wrong, the message will be lost and it won't be read again
 at least once (preferred)
  - offsets are committed after the message is processed
- - if the processing goes worng, the message will be read again
+ - if the processing goes wrong, the message will be read again
  - this can result in duplicate processing of messages => need to ensure processing is idempotent
 exactly once
  - can be achieved for Kafka => Kafka workflows using Kafka Streams API
@@ -161,8 +161,49 @@ Kafka Client -> 1. Connection + Metadata request -> Kafka cluster (Broker 101, 1
 # Kafka guarantees
 - messages are appended to a topic-partition in the order they are sent
 - consumers read messages in the order stored in a topic-partition
-- with a replication factor of N, producers and consumers can tolerate upto N-1 brokers being down
+- with a replication factor of N, producers and consumers can tolerate up-to N-1 brokers being down
 - as long as the number of partitions remains constant for a topic (no new partitions), the same key will always go to the same partition
+
+
+# Start Kafka
+- first start zookeeper 
+- change the data dir location in config/zookeeper.properties
+- then start
+zookeeper-server-start config/zookeeper.properties
+
+- similarly change data dir location in config/server.properties
+- then start kafka
+kafka-server-start config/server.properties
+
+
+###############################
+## MAC-OS installation summary
+###############################
+In summary, for Mac OS X
+
+- Install brew if needed: 
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+- Download and Setup Java 8 JDK:
+brew tap caskroom/versions
+brew cask install java8
+
+- Download & Extract the Kafka binaries from https://kafka.apache.org/downloads
+
+- Install Kafka commands using brew: 
+brew install kafka
+
+- Try Kafka commands using kafka-topics (for example)
+
+- Edit Zookeeper & Kafka configs using a text editor
+zookeeper.properties: dataDir=/your/path/to/data/zookeeper
+server.properties: log.dirs=/your/path/to/data/kafka
+
+- Start Zookeeper in one terminal window: 
+zookeeper-server-start config/zookeeper.properties
+
+- Start Kafka in another terminal window: 
+kafka-server-start config/server.properties
 
 
 
