@@ -208,7 +208,14 @@ kafka-server-start config/server.properties
 ################
 
 
-# Kafka Topics
+
+############
+# Kafka CLI
+############
+
+
+## Kafka Topics
+
 kafka-topics main arguments:
  
 --bootstrap-server <String: server to    REQUIRED: The Kafka server to connect
@@ -260,9 +267,61 @@ kafka-topics --bootstrap-server localhost:9092 --topic second_topic --delete
 
 
 
+## Kafka console producer
+
+kafka-console-producer main arguments:
+
+--bootstrap-server <String: server to    REQUIRED unless --broker-list
+  connect to>                              (deprecated) is specified. The server
+                                           (s) to connect to. The broker list
+                                           string in the form HOST1:PORT1,HOST2:
+                                           PORT2.
+
+--topic <String: topic>                  REQUIRED: The topic id to produce
+                                           messages to.
+
+--producer-property <String:             A mechanism to pass user-defined
+  producer_prop>                           properties in the form key=value to
+                                           the producer.
+
+
+- command to produce message to a broker
+kafka-console-producer --bootstrap-server localhost:9092 --topic first_topic
+
+- set the acks property
+kafka-console-producer --bootstrap-server localhost:9092 --topic first_topic --producer-property acks=all
+
+- produce to a new topic
+kafka-console-producer --bootstrap-server localhost:9092 --topic new_topic_2
 
 
 
+## Kafka console consumer
+
+kafka-console-consumer main arguments:
+
+--bootstrap-server <String: server to    REQUIRED: The server(s) to connect to.
+  connect to>
+
+--topic <String: topic>                  The topic to consume on.
+
+--group <String: consumer group id>      The consumer group id of the consumer.
+
+
+- command to consume messages from a topic (only new messages produced by producer will be consumed)
+kafka-console-consumer --bootstrap-server localhost:9092 --topic first_topic
+
+- command to consume all messages from a topic before the consumer was started
+kafka-console-consumer --bootstrap-server localhost:9092 --topic first_topic --from-beginning
+
+- consumer group
+kafka-console-consumer --bootstrap-server localhost:9092 --topic first_topic --group my-first-application
+
+- second group
+kafka-console-consumer --bootstrap-server localhost:9092 --topic first_topic --group my-second-application
+
+- from beginning - only once all the messages are consumed and then the offset will be at the end of all the messages consumed
+kafka-console-consumer --bootstrap-server localhost:9092 --topic first_topic --group my-second-application --from-beginning
 
 
 
