@@ -325,6 +325,65 @@ kafka-console-consumer --bootstrap-server localhost:9092 --topic first_topic --g
 
 
 
+## Kafka consumer groups
+
+kafka-consumer-groups main arguments:
+
+--bootstrap-server <String: server to   REQUIRED: The server(s) to connect to.
+  connect to>
+
+--list                                  List all consumer groups.
+
+--describe                              Describe consumer group and list
+                                          offset lag (number of messages not
+                                          yet processed) related to given
+                                          group.
+
+--group <String: consumer group>        The consumer group we wish to act on.
+
+--reset-offsets                         Reset offsets of consumer group.
+                                          Supports one consumer group at the
+                                          time, and instances should be
+                                          inactive
+                                        Has 2 execution options: --dry-run
+                                          (the default) to plan which offsets
+                                          to reset, and --execute to update
+                                          the offsets. Additionally, the --
+                                          export option is used to export the
+                                          results to a CSV format.
+                                        You must choose one of the following
+                                          reset specifications: --to-datetime,
+                                          --by-period, --to-earliest, --to-
+                                          latest, --shift-by, --from-file, --
+                                          to-current.
+                                        To define the scope use --all-topics
+                                          or --topic. One scope must be
+                                          specified unless you use '--from-
+                                          file'.
+
+--shift-by <Long: number-of-offsets>    Reset offsets shifting current offset
+                                          by 'n', where 'n' can be positive or
+                                          negative.
+
+
+
+- list all the consumer groups
+kafka-consumer-groups --bootstrap-server localhost:9092 --list
+
+- describe a consumer group
+kafka-consumer-groups --bootstrap-server localhost:9092 --describe --group my-third-application
+
+LAG field will define how many messages a consumer group has not consumed yet
+
+- consume the messages from LAG topic
+kafka-console-consumer --bootstrap-server localhost:9092 --topic first_topic --group my-second-application
+
+- reset offset to read all the messages from the beginning
+kafka-consumer-groups --bootstrap-server localhost:9092 --group my-first-application --reset-offsets --to-earliest --execute --topic first_topic
+
+- shift offset by -2 from current 
+kafka-consumer-groups --bootstrap-server localhost:9092 --group my-first-application --reset-offsets --shift-by -2 --execute --topic first_topic
+
 
 
 
